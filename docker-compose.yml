@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      POSTGRES_DB: Globant
+      POSTGRES_USER: globantadmin
+      POSTGRES_PASSWORD: 4dm1n
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api_container
+    environment:
+      DATABASE_URL: "postgresql+psycopg2://globantadmin:4dm1n@postgres:5432/Globant"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
