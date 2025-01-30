@@ -80,6 +80,99 @@ Proyecto/
    - La API estará disponible en `http://localhost:8000`.
    - La documentación interactiva se encuentra en `http://localhost:8000/docs`.
 
+## Despliegue en la nube
+
+### Despliegue en AWS usando Lambda
+
+1. **Preparar el entorno**:
+   - Empaqueta la aplicación junto con sus dependencias en un archivo ZIP.
+   ```bash
+   zip -r deployment-package.zip .
+   ```
+
+2. **Subir el paquete a AWS Lambda**:
+   - Crea una función Lambda desde la consola de AWS y sube el archivo ZIP.
+
+3. **Configurar API Gateway**:
+   - Configura un API Gateway para exponer tu Lambda como una API REST.
+
+4. **Probar el endpoint**:
+   - Obtén la URL de API Gateway y verifica que la API esté funcionando correctamente.
+
+---
+
+### Despliegue en AWS usando EC2
+
+1. **Lanzar una instancia EC2**:
+   - Elige una imagen AMI de Amazon Linux y configura el tamaño de la instancia.
+
+2. **Configurar el entorno en EC2**:
+   ```bash
+   sudo yum update -y
+   sudo yum install docker git python3-pip -y
+   sudo service docker start
+   sudo usermod -a -G docker ec2-user
+   ```
+
+3. **Clonar y ejecutar el proyecto**:
+   ```bash
+   git clone <URL-DEL-REPOSITORIO>
+   cd <NOMBRE-DEL-PROYECTO>
+   docker-compose up --build
+   ```
+
+4. **Configurar el acceso**:
+   - Asegúrate de abrir el puerto 8000 en el grupo de seguridad de la instancia.
+
+5. **Acceder a la API**:
+   - Usa la dirección IP pública de tu instancia para acceder a la API.
+
+---
+
+### Despliegue en Azure usando App Service
+
+1. **Instalar la CLI de Azure**:
+   ```bash
+   curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+   ```
+
+2. **Iniciar sesión en Azure**:
+   ```bash
+   az login
+   ```
+
+3. **Crear un grupo de recursos**:
+   ```bash
+   az group create --name <nombre-del-grupo> --location <región>
+   ```
+
+4. **Crear un plan de App Service**:
+   ```bash
+   az appservice plan create --name <nombre-del-plan> --resource-group <nombre-del-grupo> --sku FREE
+   ```
+
+5. **Crear una App Service para tu aplicación**:
+   ```bash
+   az webapp create --resource-group <nombre-del-grupo> --plan <nombre-del-plan> --name <nombre-de-la-app> --runtime "PYTHON:3.9"
+   ```
+
+6. **Desplegar la aplicación usando Git**:
+   ```bash
+   az webapp deployment source config-local-git --name <nombre-de-la-app> --resource-group <nombre-del-grupo>
+   ```
+   Obtendrás una URL para el repositorio Git de tu App Service.
+
+7. **Configurar tu repositorio y desplegar**:
+   ```bash
+   git remote add azure <url-del-repositorio-git>
+   git push azure master
+   ```
+
+8. **Acceder a tu aplicación**:
+   La aplicación estará disponible en `<nombre-de-la-app>.azurewebsites.net`.
+
+---
+
 ## Uso de la API
 
 ### Endpoints Principales
@@ -126,19 +219,3 @@ Los gráficos se generan dinámicamente y se pueden descargar como archivos PNG.
   ```http
   GET /api/v1/metrics/above-average-departments/chart
   ```
-
-## Tests
-
-Para ejecutar las pruebas del proyecto:
-```bash
-pytest
-```
-
-## Contribuciones
-
-Las contribuciones son bienvenidas. Por favor, abre un issue o envía un pull request con tus sugerencias.
-
-## Licencia
-
-Este proyecto está bajo la licencia MIT. Consulta el archivo `LICENSE` para más información.
-
